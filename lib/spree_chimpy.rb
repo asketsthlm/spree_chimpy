@@ -13,6 +13,7 @@ module Spree::Chimpy
   end
 
   def enqueue(event, object)
+    puts "enqueue!"
     payload = {class: object.class.name, id: object.id, object: object}
     ActiveSupport::Notifications.instrument("spree.chimpy.#{event}", payload)
   end
@@ -116,6 +117,8 @@ module Spree::Chimpy
     case event
     when :order
       orders.sync(object)
+    when :subscribe_guest
+      list.subscribe(object[:email], {}, customer: true)
     when :subscribe
       list.subscribe(object.email, merge_vars(object), customer: object.is_a?(Spree.user_class))
     when :unsubscribe
