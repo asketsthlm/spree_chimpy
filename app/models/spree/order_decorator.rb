@@ -8,6 +8,7 @@ Spree::Order.class_eval do
   around_save :handle_cancelation
 
   def notify_mail_chimp
+    puts "Notify MailChimp!"
     Spree::Chimpy.enqueue(:order, self) if completed? && Spree::Chimpy.configured?
   end
 
