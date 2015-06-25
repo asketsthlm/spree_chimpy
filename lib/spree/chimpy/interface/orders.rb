@@ -60,7 +60,7 @@ module Spree::Chimpy
       def hash(order, expected_email)
         source = order.source
         root_taxon = Spree::Taxon.where(parent_id: nil).take
-
+        total_bought = 0.0
         items = order.line_items.map do |line|
           # MC can only associate the order with a single category: associate the order with the category right below the root level taxon
           variant = line.variant
@@ -76,12 +76,14 @@ module Spree::Chimpy
            category_name: taxon ? taxon.name : Spree.t(:uncategorized, scope: :chimpy, default: 'Uncategorized'),
            cost:          variant.price.to_f,
            qty:           line.quantity}
+           total_bought+= variant.price * line.quantity.to_f
         end
 
         data = {
           id:          order.number,
           email:       order.email,
-          total:       order.total.to_f,
+          # total:       order.total.to_f,
+          total: total_bought.to_f,
           order_date:  order.completed_at ? order.completed_at.to_formatted_s(:db) : nil,
           shipping:    order.ship_total.to_f,
           tax:         order.try(:included_tax_total).to_f, # or additional_tax_total
