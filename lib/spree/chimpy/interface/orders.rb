@@ -64,6 +64,7 @@ module Spree::Chimpy
         items = order.line_items.map do |line|
           # MC can only associate the order with a single category: associate the order with the category right below the root level taxon
           variant = line.variant
+          total_bought+= variant.price * line.quantity.to_f
           taxon = variant.product.taxons.map(&:self_and_ancestors).flatten.uniq.detect { |t| t.parent == root_taxon }
 
           # assign a default taxon if the product is not associated with a category
@@ -71,12 +72,11 @@ module Spree::Chimpy
 
           {product_id:    variant.id,
            sku:           variant.sku,
-           product_name:  variant.name,
+           product_name:  variant.name + ' - ' + variant.options_text,
            category_id:   taxon ? taxon.id : 999999,
            category_name: taxon ? taxon.name : Spree.t(:uncategorized, scope: :chimpy, default: 'Uncategorized'),
            cost:          variant.price.to_f,
            qty:           line.quantity}
-           total_bought+= variant.price * line.quantity.to_f
         end
 
         data = {
