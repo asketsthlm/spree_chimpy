@@ -58,6 +58,10 @@ module Spree::Chimpy
 
     private
       def hash(order, expected_email)
+
+        log 'hash'
+        log order
+
         source = order.source
         root_taxon = Spree::Taxon.where(parent_id: nil).take
         total_bought = 0.0
@@ -92,9 +96,11 @@ module Spree::Chimpy
           items:       items
         }
 
-        if source && expected_email.upcase == order.email.upcase
-          data[:email_id]    = source.email_id
-          data[:campaign_id] = source.campaign_id
+        # Change so we are using data from order isntead of building the
+        # source from params
+        if order.mc_eid && expected_email.upcase == order.email.upcase
+          data[:email_id]    = order.mc_eid # source.email_id
+          data[:campaign_id] = order.mc_cid # source.campaign_id
         end
         data
       end

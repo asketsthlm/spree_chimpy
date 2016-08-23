@@ -17,10 +17,19 @@ module Spree::Chimpy
       end
 
       def subscribe(email, merge_vars = {}, options = {})
-        log "Subscribing #{email} to #{@list_name}"
+
+        log "Subscribin #{email} to #{@list_name}"
+        log options[:list_id]
 
         begin
-          api_call.subscribe(list_id, { email: email }, merge_vars, 'html', @double_opt_in, true, true, @send_welcome_email)
+          if options[:list_id]
+            log 'subscribing to custom list'
+            api_call.subscribe(options[:list_id], { email: email }, merge_vars, 'html', @double_opt_in, true, true, @send_welcome_email)
+          else
+            log 'subscribing to default list'
+            api_call.subscribe(list_id, { email: email }, merge_vars, 'html', @double_opt_in, true, true, @send_welcome_email)
+          end
+
 
           segment([email]) if options[:customer]
         rescue Mailchimp::ListInvalidImportError, Mailchimp::ValidationError => ex

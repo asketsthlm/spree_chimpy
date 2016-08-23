@@ -97,7 +97,7 @@ module Spree::Chimpy
 
   def handle_event(event, payload = {})
     payload[:event] = event
-
+    log('handle event #{event}')
     case
     when defined?(::Delayed::Job)
       ::Delayed::Job.enqueue(Spree::Chimpy::Workers::DelayedJob.new(payload))
@@ -111,6 +111,9 @@ module Spree::Chimpy
   def perform(payload)
     return unless configured?
 
+    log('perfom mail task')
+    log(payload[:event].to_sym)
+
     event  = payload[:event].to_sym
     object = payload[:object] || payload[:class].constantize.find(payload[:id])
 
@@ -118,7 +121,7 @@ module Spree::Chimpy
     when :order
       orders.sync(object)
     when :subscribe_guest
-      list.subscribe(object[:email], {}, customer: true)
+      list.subscribe(object[:email], merge_vars(object), {customer: true, list_id: object[:list_id]})
     when :subscribe
       list.subscribe(object.email, merge_vars(object), customer: object.is_a?(Spree.user_class))
     when :unsubscribe
