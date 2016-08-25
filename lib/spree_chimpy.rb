@@ -69,13 +69,16 @@ module Spree::Chimpy
 
   def merge_vars(model)
     attributes = Config.merge_vars.except('EMAIL')
-
+    log "allowed attrs for merge_vars #{attributes}"
     array = attributes.map do |tag, method|
+      log "tag: #{tag}"
+      log "method: #{method}"
+      log "model: #{model}"
       value = model.send(method) if model.methods.include?(method)
-
+      log "value: #{value}"
       [tag, value.to_s]
     end
-
+    log "return hash: #{array}"
     Hash[array]
   end
 

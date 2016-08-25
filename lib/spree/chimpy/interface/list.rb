@@ -19,7 +19,8 @@ module Spree::Chimpy
       def subscribe(email, merge_vars = {}, options = {})
 
         log "Subscribin #{email} to #{@list_name}"
-        log options[:list_id]
+        log "with merge_vars #{merge_vars}"
+        log "to list_id #{options[:list_id]}"
 
         begin
           if options[:list_id]
